@@ -1,0 +1,8 @@
+config BR2_PACKAGE_MSED
+	bool "msed"
+	select BR2_PACKAGE_NCURSES
+	help
+	  Tools to manage the activation and use of self encrypting drives
+          that comply with the Trusted Computing Group Opal 2.0 SSC. 
+
+	  http://www.r0m30.com/msed

@@ -1,0 +1,46 @@
+diff --git a/msed/linux/MsedDevOS.cpp b/msed/linux/MsedDevOS.cpp
+index 0371843..1d5c0f7 100644
+--- a/msed/linux/MsedDevOS.cpp
++++ b/msed/linux/MsedDevOS.cpp
+@@ -26,6 +26,8 @@ along with msed.  If not, see <http://www.gnu.org/licenses/>.
+ #include <stdio.h>
+ #include <string.h>
+ #include <unistd.h>
++#include <malloc.h>
++#include <time.h>
+ #include <linux/hdreg.h>
+ #include <errno.h>
+ #include <vector>
+@@ -177,7 +179,7 @@ void MsedDevOS::identify()
+     LOG(D4) << "Entering MsedDevOS::identify()";
+     vector<uint8_t> nullz(512, 0x00);
+     if (!isOpen) return; //disk open failed so this will too
+-    uint8_t * buffer = (uint8_t *) aligned_alloc(IO_BUFFER_ALIGNMENT, IO_BUFFER_LENGTH);
++    uint8_t * buffer = (uint8_t *) memalign(IO_BUFFER_ALIGNMENT, IO_BUFFER_LENGTH);
+     memset(buffer, 0, IO_BUFFER_LENGTH);
+     if (ioctl(fd, HDIO_GET_IDENTITY, buffer) < 0) {
+         LOG(E) << "Identify failed " << strerror(errno);
+@@ -214,8 +216,14 @@ void MsedDevOS::identify()
+ 
+ void MsedDevOS::osmsSleep(uint32_t ms)
+ {
+-
+-    usleep(ms * 1000); //convert to microseconds
++    struct timespec req = {0};
++    time_t sec = (int)(ms/1000);
++    ms = ms - (sec*1000);
++    req.tv_sec = sec;
++    req.tv_nsec = ms*1000000L;
++
++    while(nanosleep(&req,&req) == -1)
++        continue;
+     return;
+ }
+ 
+@@ -224,4 +232,4 @@ MsedDevOS::~MsedDevOS()
+ {
+     LOG(D1) << "Destroying MsedDev";
+     close(fd);
+-}
+\ No newline at end of file
++}
