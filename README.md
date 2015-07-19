@@ -48,35 +48,35 @@ Building the LinuxPBA image
 
 Download and unpack buildroot:
 
-curl -L http://buildroot.uclibc.org/downloads/buildroot-2015.05.tar.gz | tar xvzf -
+    curl -L http://buildroot.uclibc.org/downloads/buildroot-2015.05.tar.gz | tar xvzf -
 
 Download and unpack buildroot-linuxpba:
 
-curl -L https://github.com/cranderson/buildroot-linuxpba/archive/master.tar.gz | tar xvzf -
+    curl -L https://github.com/cranderson/buildroot-linuxpba/archive/master.tar.gz | tar xvzf -
 
 Copy the contents of buildroot-linuxpba into buildroot:
 
-cp -av buildroot-linuxpba-master/* buildroot-2015.05/
+    cp -av buildroot-linuxpba-master/* buildroot-2015.05/
 
 Go into the buildroot directory, load the config file, and build:
 
-cd buildroot-2015.05
-make linuxpba_defconfig
-make
+    cd buildroot-2015.05
+    make linuxpba_defconfig
+    make
 
 Buildroot will download, unpack, patch, configure, and build
 everything it needs.  This will take awhile.  When the build finishes,
 you will have a msedlinuxpba.img file in the output/images directory:
 
-drwxr-x---. 4 cra cra    4096 Jul 19 03:50 ./
-drwxr-x---. 6 cra cra    4096 Jul 19 03:39 ../
-drwxr-x---. 3 cra cra    4096 Jul 19 03:47 bootfs/
--rw-r-----. 1 cra cra 3145728 Jul 19 03:47 bootfs.img
--rw-r-----. 1 cra cra 1436864 Jul 19 03:47 bzImage
--rw-r-----. 1 cra cra 4194304 Jul 19 03:50 msedlinuxpba.img
--rw-r-----. 1 cra cra 2044928 Jul 19 03:47 rootfs.cpio
--rw-r-----. 1 cra cra  853489 Jul 19 03:47 rootfs.cpio.gz
-drwxr-xr-x. 2 cra cra    4096 Jul 19 03:46 syslinux/
+    drwxr-x---. 4 cra cra    4096 Jul 19 03:50 ./
+    drwxr-x---. 6 cra cra    4096 Jul 19 03:39 ../
+    drwxr-x---. 3 cra cra    4096 Jul 19 03:47 bootfs/
+    -rw-r-----. 1 cra cra 3145728 Jul 19 03:47 bootfs.img
+    -rw-r-----. 1 cra cra 1436864 Jul 19 03:47 bzImage
+    -rw-r-----. 1 cra cra 4194304 Jul 19 03:50 msedlinuxpba.img
+    -rw-r-----. 1 cra cra 2044928 Jul 19 03:47 rootfs.cpio
+    -rw-r-----. 1 cra cra  853489 Jul 19 03:47 rootfs.cpio.gz
+    drwxr-xr-x. 2 cra cra    4096 Jul 19 03:46 syslinux/
 
 Loading the LinuxPBA image onto your SED
 ----------------------------------------
@@ -97,21 +97,21 @@ http://www.r0m30.com/msed/documentation/building
 
 Basically, just do:
 
-make CONF=Release_i686
-or
-make CONF=Release_x86_64
+    make CONF=Release_i686
+    or
+    make CONF=Release_x86_64
 
 You can find the built "msed" tool under the "dist/Release_arch"
 directory:
 
-cd dist/Release_i686 (or cd dist/Release_x86_64)
-./msed
+    cd dist/Release_i686 (or cd dist/Release_x86_64)
+    ./msed
 
 Finally, you need to use the "msed" tool to set up your drive and load
 the PBA image.  See here for documentation:
 
 http://www.r0m30.com/msed/documentation/managing
 
-./msed --initialsetup <password> <drive>
-./msed --loadPBAimage <password> msedlinuxpba.img  <drive>
-./msed --enableLockingRange 0 <password> <drive>
+    ./msed --initialsetup <password> <drive>
+    ./msed --loadPBAimage <password> msedlinuxpba.img  <drive>
+    ./msed --enableLockingRange 0 <password> <drive>
