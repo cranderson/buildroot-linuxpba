@@ -1,0 +1,189 @@
+commit 6f2faa21be1712ceae1fa558587089d37510cc58
+Author: Bernhard Reutner-Fischer <rep.dot.nop@gmail.com>
+Date:   Mon Mar 25 10:46:41 2013 +0100
+
+    libstdc++-v3: Check for obsolescent ::tmpnam
+    
+    POSIX.1-2008 (SUSv4) marks tmpnam() as obsolescent. As such it is not
+    available in uClibc unless SUSv4 legacy stuff is enabled.
+    
+    Add configure check for tmpnam
+    
+    libstdc++-v3/ChangeLog
+    
+    2013-03-24  Bernhard Reutner-Fischer  <aldot@gcc.gnu.org>
+    
+    	* acinclude.m4 (GLIBCXX_CHECK_TMPNAM): New check for tmpnam
+    	function.
+    	* configure.ac: Use GLIBCXX_CHECK_TMPNAM.
+    	* (configure, config.h.in): Regenerate.
+    	* include/c_global/cstdio: Guard ::tmpnam with _GLIBCXX_USE_TMPNAM
+    
+    Signed-off-by: Bernhard Reutner-Fischer <rep.dot.nop@gmail.com>
+
+diff --git a/libstdc++-v3/acinclude.m4 b/libstdc++-v3/acinclude.m4
+index f9d12d0..e0b60be 100644
+--- a/libstdc++-v3/acinclude.m4
++++ b/libstdc++-v3/acinclude.m4
+@@ -3771,6 +3771,33 @@ AC_DEFUN([GLIBCXX_ENABLE_WERROR], [
+   GLIBCXX_CONDITIONAL(ENABLE_WERROR, test $enable_werror = yes)
+ ])
+ 
++dnl
++dnl Check whether obsolescent tmpnam is available in <stdio.h>,
++dnl and define _GLIBCXX_USE_TMPNAM.
++dnl
++AC_DEFUN([GLIBCXX_CHECK_TMPNAM], [dnl
++dnl
++  AC_LANG_SAVE
++  AC_LANG_CPLUSPLUS
++  ac_save_CXXFLAGS="$CXXFLAGS"
++  CXXFLAGS="$CXXFLAGS -fno-exceptions"
++dnl
++  AC_MSG_CHECKING([for tmpnam])
++  AC_CACHE_VAL(glibcxx_cv_TMPNAM, [dnl
++    GCC_TRY_COMPILE_OR_LINK(
++      [#include <stdio.h>],
++      [char *tmp = tmpnam("NULL");],
++      [glibcxx_cv_TMPNAM=yes],
++      [glibcxx_cv_TMPNAM=no])
++  ])
++  if test $glibcxx_cv_TMPNAM = yes; then
++    AC_DEFINE(_GLIBCXX_USE_TMPNAM, 1, [Define if obsolescent tmpnam is available in <stdio.h>.])
++  fi
++  AC_MSG_RESULT($glibcxx_cv_TMPNAM)
++dnl
++  CXXFLAGS="$ac_save_CXXFLAGS"
++  AC_LANG_RESTORE
++])
+ 
+ dnl
+ dnl Check to see if sys/sdt.h exists and that it is suitable for use.
+diff --git a/libstdc++-v3/config.h.in b/libstdc++-v3/config.h.in
+index 4c029d2..adc7d44 100644
+--- a/libstdc++-v3/config.h.in
++++ b/libstdc++-v3/config.h.in
+@@ -867,6 +867,9 @@
+ /* Define if sysctl(), CTL_HW and HW_NCPU are available in <sys/sysctl.h>. */
+ #undef _GLIBCXX_USE_SYSCTL_HW_NCPU
+ 
++/* Define if obsolescent tmpnam is available in <stdio.h>. */
++#undef _GLIBCXX_USE_TMPNAM
++
+ /* Define if code specialized for wchar_t should be used. */
+ #undef _GLIBCXX_USE_WCHAR_T
+ 
+diff --git a/libstdc++-v3/configure b/libstdc++-v3/configure
+index 4be21b1..f7edc50 100755
+--- a/libstdc++-v3/configure
++++ b/libstdc++-v3/configure
+@@ -20120,6 +20120,81 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
+ 
+ 
+ 
++# Check for tmpnam which is obsolescent in POSIX.1-2008
++
++  ac_ext=cpp
++ac_cpp='$CXXCPP $CPPFLAGS'
++ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
++ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
++ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
++
++  ac_save_CXXFLAGS="$CXXFLAGS"
++  CXXFLAGS="$CXXFLAGS -fno-exceptions"
++  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for tmpnam" >&5
++$as_echo_n "checking for tmpnam... " >&6; }
++  if test "${glibcxx_cv_TMPNAM+set}" = set; then :
++  $as_echo_n "(cached) " >&6
++else
++      if test x$gcc_no_link = xyes; then
++  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
++/* end confdefs.h.  */
++#include <stdio.h>
++int
++main ()
++{
++char *tmp = tmpnam("NULL");
++  ;
++  return 0;
++}
++_ACEOF
++if ac_fn_cxx_try_compile "$LINENO"; then :
++  glibcxx_cv_TMPNAM=yes
++else
++  glibcxx_cv_TMPNAM=no
++fi
++rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
++else
++  if test x$gcc_no_link = xyes; then
++  as_fn_error "Link tests are not allowed after GCC_NO_EXECUTABLES." "$LINENO" 5
++fi
++cat confdefs.h - <<_ACEOF >conftest.$ac_ext
++/* end confdefs.h.  */
++#include <stdio.h>
++int
++main ()
++{
++char *tmp = tmpnam("NULL");
++  ;
++  return 0;
++}
++_ACEOF
++if ac_fn_cxx_try_link "$LINENO"; then :
++  glibcxx_cv_TMPNAM=yes
++else
++  glibcxx_cv_TMPNAM=no
++fi
++rm -f core conftest.err conftest.$ac_objext \
++    conftest$ac_exeext conftest.$ac_ext
++fi
++
++fi
++
++  if test $glibcxx_cv_TMPNAM = yes; then
++
++$as_echo "#define _GLIBCXX_USE_TMPNAM 1" >>confdefs.h
++
++  fi
++  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $glibcxx_cv_TMPNAM" >&5
++$as_echo "$glibcxx_cv_TMPNAM" >&6; }
++  CXXFLAGS="$ac_save_CXXFLAGS"
++  ac_ext=c
++ac_cpp='$CPP $CPPFLAGS'
++ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
++ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
++ac_compiler_gnu=$ac_cv_c_compiler_gnu
++
++
++
+ 
+   ac_fn_c_check_header_mongrel "$LINENO" "locale.h" "ac_cv_header_locale_h" "$ac_includes_default"
+ if test "x$ac_cv_header_locale_h" = x""yes; then :
+diff --git a/libstdc++-v3/configure.ac b/libstdc++-v3/configure.ac
+index 22fc840..1de0f6c 100644
+--- a/libstdc++-v3/configure.ac
++++ b/libstdc++-v3/configure.ac
+@@ -213,6 +213,9 @@ GLIBCXX_CHECK_GETTIMEOFDAY
+ # For clock_gettime, nanosleep and sched_yield support.
+ GLIBCXX_ENABLE_LIBSTDCXX_TIME
+ 
++# Check for tmpnam which is obsolescent in POSIX.1-2008
++GLIBCXX_CHECK_TMPNAM
++
+ AC_LC_MESSAGES
+ 
+ # For hardware_concurrency
+diff --git a/libstdc++-v3/include/c_global/cstdio b/libstdc++-v3/include/c_global/cstdio
+index b566073..13d6b35 100644
+--- a/libstdc++-v3/include/c_global/cstdio
++++ b/libstdc++-v3/include/c_global/cstdio
+@@ -137,7 +137,9 @@ namespace std
+   using ::sprintf;
+   using ::sscanf;
+   using ::tmpfile;
++#if _GLIBCXX_USE_TMPNAM
+   using ::tmpnam;
++#endif
+   using ::ungetc;
+   using ::vfprintf;
+   using ::vprintf;
