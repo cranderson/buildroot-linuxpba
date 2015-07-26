@@ -1,5 +1,6 @@
 # buildroot-linuxpba
 A Buildroot-based embedded Linux distro for MSED/LinuxPBA Pre-Boot Authorization of OPAL Self-Encrypting Drives
+
 Copyright (c) 2015 Charles R. Anderson <cra@wpi.edu>
 
 Description
