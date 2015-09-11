@@ -44,6 +44,14 @@ General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+Pre-built LinuxPBA image
+------------------------
+
+A pre-built LinuxPBA image is now included.  It is called
+msedlinuxpba.img and is located in the same directory as this
+README.md file.  To use it, see the "Loading the LinuxPBA image onto
+your SED" section below.
+
 Building the LinuxPBA image
 ---------------------------
 
