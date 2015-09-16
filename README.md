@@ -91,8 +91,13 @@ Loading the LinuxPBA image onto your SED
 ----------------------------------------
 
 You will need to use MSED to load the PBA image "msedlinuxpba.img"
-onto your self-encrypting drive.  You can download a pre-built MSED
-from here:
+onto your self-encrypting drive.
+
+Fedora now includes MSED.  You can install it via:
+
+    dnf install msed
+
+For other systems, you can download a pre-built MSED from here:
 
 http://www.r0m30.com/msed/files
 
